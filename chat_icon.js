@@ -50,7 +50,7 @@
     widget.className = 'v-chat-wrap';
     widget.innerHTML = `
         <div class="v-chat-window" id="vWindow">
-            <div class="v-header">VILTO SUPPORT // ONLINE</div>
+            <div class="v-header">TREX SUPPORT // ONLINE</div>
             <div class="v-msgs" id="vMsgs">
                 <div class="v-msg assistant">Connection established. How can I assist you today ?</div>
             </div>
@@ -67,7 +67,7 @@
     `;
     document.body.appendChild(widget);
 
-    // 3. LOGIC (Your Backend Integration)
+    // 3. LOGIC (Backend Integration)
     const vToggleBtn = document.getElementById('vToggleBtn');
     const vWindow = document.getElementById('vWindow');
     const inputField = document.getElementById('vInput');
@@ -84,48 +84,69 @@
     // Helper: Add Message to UI
     function addMessage(sender, text) {
         const div = document.createElement('div');
-        // Maps 'user' to .user and 'assistant' to .assistant classes
         div.className = `v-msg ${sender}`; 
         div.innerText = text;
         vMsgs.appendChild(div);
         vMsgs.scrollTop = vMsgs.scrollHeight;
     }
 
-    // Main Send Function (Backend Integrated)
+    // Main Send Function
     function sendMessage() {
-    const message = inputField.value.trim();
-    if (!message) return;
+        const message = inputField.value.trim();
+        if (!message) return;
 
-    addMessage('user', message);
-    inputField.value = '';
+        addMessage('user', message);
+        inputField.value = '';
 
-    fetch('https://trex-backend-09ab.onrender.com/api/support', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            message,
-            user: { name: 'Selam', preferences: {} }
+        // Add a "Thinking..." indicator (optional polish)
+        const loadingId = 'loading-' + Date.now();
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'v-msg assistant';
+        loadingDiv.id = loadingId;
+        loadingDiv.innerText = '...';
+        vMsgs.appendChild(loadingDiv);
+
+        fetch('https://trex-backend-09ab.onrender.com/api/support', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message,
+                user: { name: 'Selam', preferences: {} }
+            })
         })
-    })
-    .then(async response => {
-        const data = await response.json().catch(() => null);
+        .then(async response => {
+            // Remove loading indicator
+            const loader = document.getElementById(loadingId);
+            if(loader) loader.remove();
 
-        if (!response.ok) {
-            // Backend error but readable message
-            addMessage(
-                'assistant',
-                data?.reply || 'Server error. Please try again.'
-            );
-            return;
+            const data = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                addMessage('assistant', data?.reply || 'Server error. Please try again.');
+                return;
+            }
+            addMessage('assistant', data.reply);
+        })
+        .catch(err => {
+            // Remove loading indicator on error too
+            const loader = document.getElementById(loadingId);
+            if(loader) loader.remove();
+            
+            console.error('Network error:', err);
+            addMessage('assistant', 'Network error. Please check your connection.');
+        });
+    }
+
+    // --- FIX: WIRING UP THE EVENTS ---
+    
+    // 1. Click Listener for the Send Button
+    sendButton.onclick = sendMessage;
+
+    // 2. "Enter" Key Listener for the Input Box
+    inputField.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
         }
-
-        addMessage('assistant', data.reply);
-    })
-    .catch(err => {
-        console.error('Network error:', err);
-        addMessage(
-            'assistant',
-            'Network error. Please check your connection.'
-        );
     });
-}
+
+})(); // <--- THIS WAS MISSING! This tells the code to "Run Now".
