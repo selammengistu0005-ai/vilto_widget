@@ -106,7 +106,7 @@
         loadingDiv.innerText = '...';
         vMsgs.appendChild(loadingDiv);
 
-        fetch('https://trex-backend-09ab.onrender.com/api/support', {
+        fetch('https://vilto-trex-backend.onrender.com/api/support', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -150,3 +150,4 @@
     });
 
 })(); // <--- THIS WAS MISSING! This tells the code to "Run Now".
+
