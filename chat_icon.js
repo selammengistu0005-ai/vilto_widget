@@ -52,7 +52,7 @@
         <div class="v-chat-window" id="vWindow">
             <div class="v-header">VILTO SUPPORT // ONLINE</div>
             <div class="v-msgs" id="vMsgs">
-                <div class="v-msg assistant">Connection established. How can I assist you today, Selam?</div>
+                <div class="v-msg assistant">Connection established. How can I assist you today ?</div>
             </div>
             <div class="v-input-box">
                 <input type="text" id="vInput" placeholder="Type your message...">
@@ -131,3 +131,4 @@
 
     console.log("Vilto Chat: Backend Integration Active.");
 })();
+
