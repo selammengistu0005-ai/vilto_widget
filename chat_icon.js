@@ -93,42 +93,39 @@
 
     // Main Send Function (Backend Integrated)
     function sendMessage() {
-        const message = inputField.value.trim();
-        if (!message) return;
+    const message = inputField.value.trim();
+    if (!message) return;
 
-        // 1. Add User Message to UI
-        addMessage('user', message);
-        inputField.value = '';
+    addMessage('user', message);
+    inputField.value = '';
 
-        // 2. Send to Backend
-        fetch('https://trex-backend-09ab.onrender.com/api/support', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                message, 
-                user: { name: 'Selam', preferences: {} } // Hardcoded as per your request
-            })
+    fetch('https://trex-backend-09ab.onrender.com/api/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            message,
+            user: { name: 'Selam', preferences: {} }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                addMessage('assistant', data.reply);
-            } else {
-                addMessage('assistant', 'Sorry, there was an error. Please try again.');
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            addMessage('assistant', 'Sorry, connection issue. Please try again.');
-        });
-    }
+    })
+    .then(async response => {
+        const data = await response.json().catch(() => null);
 
-    // Event Listeners
-    sendButton.addEventListener('click', sendMessage);
-    inputField.addEventListener('keypress', (e) => { 
-        if (e.key === 'Enter') sendMessage(); 
+        if (!response.ok) {
+            // Backend error but readable message
+            addMessage(
+                'assistant',
+                data?.reply || 'Server error. Please try again.'
+            );
+            return;
+        }
+
+        addMessage('assistant', data.reply);
+    })
+    .catch(err => {
+        console.error('Network error:', err);
+        addMessage(
+            'assistant',
+            'Network error. Please check your connection.'
+        );
     });
-
-    console.log("Vilto Chat: Backend Integration Active.");
-})();
-
+}
