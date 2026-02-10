@@ -50,7 +50,7 @@
     widget.className = 'v-chat-wrap';
     widget.innerHTML = `
         <div class="v-chat-window" id="vWindow">
-            <div class="v-header">TREX SUPPORT // ONLINE</div>
+            <div class="v-header">VITO SUPPORT</div>
             <div class="v-msgs" id="vMsgs">
                 <div class="v-msg assistant">Connection established. How can I assist you today ?</div>
             </div>
@@ -150,4 +150,5 @@
     });
 
 })(); // <--- THIS WAS MISSING! This tells the code to "Run Now".
+
 
